@@ -45,12 +45,12 @@ const googleRoute = async (req, res) => {
 
 const registerRoute = async (req, res) => {
     if (req.body) {
-      const { email, name, password } = req.body;
+      const { email, name, password , accType } = req.body;
       const user = await User.findOne({ email });
   
       if (!user) {
         try {
-          const newUser = new User({ email, password, name });
+          const newUser = new User({ email, password, name,accType });
           await newUser.save();
           console.log('User saved successfully.');
           res.status(201).json({ message: 'User registered successfully' });
