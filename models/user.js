@@ -21,7 +21,7 @@ const userSchema = new mongoose.Schema({
   accType: {
     type: String,
     default:"customer",
-    enum: ['admin', 'vendor', 'customer'],
+    enum: ['admin', 'vendor', 'client'],
     required: true,
   },
   createdAt: {
