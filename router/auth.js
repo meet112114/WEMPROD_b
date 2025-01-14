@@ -50,6 +50,6 @@ router.post('/register/vendor', vendorRegisterRoute) // vendor signup route
 
 
 router.post('/add/venue' , LoginAuth ,uploadFiles , addVenue) // adding new venues
-router.post('/add/service', LoginAuth ,uploadFiles ,xaddServices ) // adding new services
+router.post('/add/service', LoginAuth ,uploadFiles ,addServices ) // adding new services
 
 module.exports = router;

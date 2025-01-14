@@ -40,12 +40,13 @@ const addVenue = async(req,res) => {
 
 const addServices = async (req, res) => {
     const user = req.userID;
+    console.log(user);
     const isVendor = await VendorPro.findOne({ refId: user });
   
     if (isVendor) {
       const { name, description, basePrice,  veneues } = req.body;
-
-      const veneuesArray = JSON.parse(veneues);
+      
+      const veneuesArray = Array.isArray(veneues) ? veneues : [];
 
       if (name && description && veneues && basePrice) {
         try {
@@ -59,6 +60,7 @@ const addServices = async (req, res) => {
             vendorId: isVendor._id , 
             description,
             basePrice ,
+
             images,
             venueList
           });
@@ -72,6 +74,7 @@ const addServices = async (req, res) => {
                     services: newService._id, 
                 }
             }
+            
         );
 
           res.status(201).json({ message: "Service added successfully", newService });
