@@ -8,16 +8,29 @@ const googleRoute = async (req, res) => {
   if (req.user) {
     const email = req.user.emails[0].value;
     const name = req.user.displayName;
-
+    const googleId = req.user.id;
+    console.log(googleId);
     try {
       let user = await User.findOne({ email });
-
+      let accType = "client";
       if (!user) {
-        user = new User({ email, googleId, name });
+        user = new User({ email, googleId, name ,accType });
         await user.save();
         const clientProfile = new ClientPro({ refId: user._id, name });
         await clientProfile.save();
         console.log("User saved successfully.");
+        
+        let token = jwt.sign({ email }, process.env.SECRET_KEY, {
+          expiresIn: "7d",
+        });
+        console.log("Generated Token:", token);
+
+        res.cookie("jwtoken", token, {
+          expires: new Date(Date.now() + 2589200000),
+          httpOnly: true,
+        });
+        return res.json({ message: "User login successful", token });
+
       } else if (user.password) {
         return res
           .status(400)
