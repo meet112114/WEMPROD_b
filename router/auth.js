@@ -7,9 +7,13 @@ const cookieParser = require("cookie-parser");
 router.use(express.json());
 router.use(cookieParser());
 
+//  importing controller functions  
+
 const LoginAuth = require('../middleware/jwtmiddleware');
-const {  googleRoute, clintRegisterRoute , loginRoute , EditProfile, vendorRegisterRoute } = require('../controller/accountControllers');
-const {addVenue , addServices} = require("../controller/venueControllers");
+const {  googleRoute, clintRegisterRoute , loginRoute , EditProfile, vendorRegisterRoute , getVendorProfile} = require('../controller/accountControllers');
+const {addVenue , addServices,acceptService,rejectService,GetVenue ,GetServicesByVenue , getAllVenue} = require("../controller/venueControllers");
+
+// multer config
 
 const path = require('path');
 const multer  = require('multer');
@@ -32,6 +36,8 @@ const uploadFiles = upload.fields([
   { name: 'images', maxCount: 10 } // Multiple images field
 ]);
 
+///  
+
 
 
 
@@ -41,15 +47,27 @@ router.get('/auth/google/callback', passport.authenticate('google', {
     failureRedirect: '/login',
     successRedirect: '/google'
 }));
-
 router.get('/google', googleRoute);  // google signin/login route
+
+// account register-login-edit
 router.post('/register/client', clintRegisterRoute); // client signup route 
 router.post('/login' , loginRoute);   // normal signin route
+router.get('/get/vendor/profile',LoginAuth , getVendorProfile) // Get profile for Vendor
 router.put('/profile/edit' , LoginAuth , EditProfile)   // create profile 
 router.post('/register/vendor', vendorRegisterRoute) // vendor signup route 
+router.post('/logout', (req, res) => {
+  res.clearCookie('jwtoken', { path: '/' });
+  res.status(200).json({ message: 'Logout successful' });
+});
 
 
+// venue - services related route
 router.post('/add/venue' , LoginAuth ,uploadFiles , addVenue) // adding new venues
 router.post('/add/service', LoginAuth ,uploadFiles ,addServices ) // adding new services
+router.post('/accept/service' , LoginAuth , acceptService)  // accepting services in a venue
+router.post('/reject/service' , LoginAuth , rejectService)  // reject the service from vendors venue
+router.get('/getAllVenue', getAllVenue)
+router.get('/get/venue/:location' , GetVenue)
+router.get('/get/serviceById/:venueId' , GetServicesByVenue)
 
 module.exports = router;

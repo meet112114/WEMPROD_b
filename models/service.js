@@ -16,10 +16,6 @@ const ServicesSchema = new mongoose.Schema({
     images :{
         type: [String]
     },
-    basePrice: {
-        type:String,
-        required: true
-    },
     venueList: [
         {
             venueId:{
@@ -30,7 +26,23 @@ const ServicesSchema = new mongoose.Schema({
                 default:"false"
             }
         }
-    ]
+    ],
+    plans: [
+        {
+          planName: {
+            type: String,
+            required: true,
+          },
+          description: {
+            type: String,
+            required: true,
+          },
+          price: {
+            type: Number,
+            required: true,
+          },
+        },
+      ]
 })
 
 const Service = mongoose.model("Service" , ServicesSchema )

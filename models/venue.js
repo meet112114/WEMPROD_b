@@ -17,6 +17,14 @@ const VenueSchema = new mongoose.Schema({
         type: String,
         required : true
     },
+    address:{
+        type: String,
+        required: true
+    },
+    locationUrl:{
+        type: String,
+        required: true
+    },
     location :{
         type: String,
         required : true

@@ -29,7 +29,8 @@ const googleRoute = async (req, res) => {
           expires: new Date(Date.now() + 2589200000),
           httpOnly: true,
         });
-        return res.json({ message: "User login successful", token });
+
+        res.redirect('http://localhost:5173/google');
 
       } else if (user.password) {
         return res
@@ -45,7 +46,8 @@ const googleRoute = async (req, res) => {
           expires: new Date(Date.now() + 2589200000),
           httpOnly: true,
         });
-        return res.json({ message: "User login successful", token });
+        
+        res.redirect('http://localhost:5173/google');
       }
     } catch (error) {
       console.error("Error handling user login:", error);
@@ -66,8 +68,10 @@ const clintRegisterRoute = async (req, res) => {
       if (!user) {
         try {
           const newUser = new User({ email, password, name, accType });
+          console.log(newUser);
           await newUser.save();
           const clientProfile = new ClientPro({ refId: newUser._id, name });
+          console.log(clientProfile);
           await clientProfile.save();
           console.log("User saved successfully.");
           res.status(201).json({ message: "User registered successfully" });
@@ -156,27 +160,43 @@ const vendorRegisterRoute = async (req, res) => {
 };
 
 const loginRoute = async (req, res) => {
-  const { email, password } = req.body;
-  const userLogin = await User.findOne({ email });
+  try {
+    const { email, password, accType } = req.body;
 
-  if (userLogin) {
+    if (!email || !password || !accType) {
+      return res.status(400).json({ error: "All fields are required" });
+    }
+
+    const userLogin = await User.findOne({ email });
+    if (!userLogin) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    if (userLogin.accType !== accType) {
+      return res.status(403).json({ error: "Account type mismatch" });
+    }
+
     const isMatch = await bcrypt.compare(password, userLogin.password);
     if (!isMatch) {
-      return res.status(400).json({ error: "Invalid credentials" });
-    } else {
-      let token = jwt.sign({ email: userLogin.email }, process.env.SECRET_KEY, {
-        expiresIn: "7d",
-      });
-      res.cookie("jwtoken", token, {
-        expires: new Date(Date.now() + 2589200000),
-        httpOnly: true,
-      });
-      return res.json({ message: "User login successful", token });
+      return res.status(401).json({ error: "Invalid credentials" });
     }
-  } else {
-    res.status(400).json({ error: "Invalid credentials" });
+
+    const token = jwt.sign({ email: userLogin.email }, process.env.SECRET_KEY, {
+      expiresIn: "7d",
+    });
+
+    res.cookie("jwtoken", token, {
+      expires: new Date(Date.now() + 2589200000), // About 30 days
+      httpOnly: true,
+    });
+
+    return res.status(200).json({ message: "User login successful", token });
+  } catch (error) {
+    console.error("Error in login route:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 };
+
 
 const EditProfile = async (req, res) => {
   if (req.body) {
@@ -209,10 +229,21 @@ const EditProfile = async (req, res) => {
   }
 };
 
+const getVendorProfile = async (req,res) => {
+  const refId = req.userID;
+  if(refId){
+    const vendorProfile = await VendorPro.findOne({refId})
+    res.send(vendorProfile);
+  }else{
+    res.status(400).json({message:"no id found"})
+  }
+}
+
 module.exports = {
   googleRoute,
   clintRegisterRoute,
   loginRoute,
   EditProfile,
   vendorRegisterRoute,
+  getVendorProfile
 };
