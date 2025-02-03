@@ -13,6 +13,9 @@ const VenueSchema = new mongoose.Schema({
         type: String,
         required : true
     },
+    tags:[
+        {type: String}
+    ],
     venueDecs:{
         type: String,
         required : true

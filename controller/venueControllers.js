@@ -3,43 +3,54 @@ const VendorPro = require("../models/vendorProfile");
 const Venue = require("../models/venue")
 const Service = require("../models/service")
 
+const addVenue = async (req, res) => {
+  const user = req.userID;
+  const isVendor = await VendorPro.findOne({ refId: user });
 
-const addVenue = async(req,res) => {
-    const user = req.userID;
-    const isVendor = await VendorPro.findOne({refId : user})
-    if(isVendor){
-        const { name , venueType , venueDecs , location , basePrice , tags , locationUrl , address } = req.body;
-        if(name && venueType && venueDecs && location && basePrice){
+  if (isVendor) {
+      const { name, venueType, venueDecs , basePrice, locationUrl, address } = req.body;
+      const location = isVendor.location;
+      // Fix: Handle tags properly
+      const tags = Array.isArray(req.body.tags) ? req.body.tags : req.body.tags.split(',');
 
-          
-          const images = req.files['images'] ? req.files['images'].map(file => `/assets/images/${file.filename}`) : [];
+      // Handle images
+      const images = req.files?.['images'] ? req.files['images'].map(file => `/assets/images/${file.filename}`) : [];
 
-            const venue= new Venue({ vendorId : isVendor._id ,  name , venueType , venueDecs , locationUrl , address,location , basePrice ,tags , images })
-            await venue.save();
-            
+      if (name && venueType && venueDecs && location && basePrice) {
+          const venue = new Venue({
+              vendorId: isVendor._id,
+              name,
+              venueType,
+              venueDecs,
+              locationUrl,
+              address,
+              location,
+              basePrice,
+              tags,
+              images
+          });
 
-            const updatedVendorPro = await VendorPro.updateOne(
-                { _id: isVendor._id }, 
-                {
-                    $push: {
-                        venues: venue._id, 
-                    }
-                }
-            );
+          await venue.save();
 
-            res.status(200).send(venue)
+          await VendorPro.updateOne(
+              { _id: isVendor._id },
+              { $push: { venues: venue._id } }
+          );
 
-        }else{
-            res.status(400).json({message : "Required Data is not provided"})
-        }
-    }else{
-        res.status(400).json({message : "user must be vendor tro access this route"})
-    }
-}
-
+          res.status(200).json(venue);
+      } else {
+          res.status(400).json({ message: "Required data is not provided" });
+      }
+  } else {
+      res.status(400).json({ message: "User must be a vendor to access this route" });
+  }
+};
+           
+   
 const addServices = async (req, res) => {
   const user = req.userID;
   const isVendor = await VendorPro.findOne({ refId: user });
+  const location = isVendor.location;
 
   if (isVendor) {
     const { name, description, plans, venues } = req.body;
@@ -66,6 +77,7 @@ const addServices = async (req, res) => {
       const newService = new Service({
         name,
         vendorId: isVendor._id,
+        location,
         description,
         plans: plansArray,
         images,
@@ -224,4 +236,108 @@ const addServices = async (req, res) => {
     res.send(venues).status(200)
   }
 
-module.exports = {addVenue,addServices,acceptService,rejectService, GetVenue , GetServicesByVenue ,getAllVenue}
+  const getVendorsVenues = async (req ,res) => {
+
+    const user = req.userID;
+    const isVendor = await VendorPro.findOne({ refId: user });
+    console.log(isVendor)
+    if(isVendor){
+      try{
+        const data = await Venue.find({vendorId:isVendor._id})
+        res.status(200).send(data)
+      }catch(e){
+        res.status(400).send("error",e)
+      }
+    }else{
+      res.status(400).send("no vendor is logged in")
+    }
+
+  }
+
+  const getVendorsServices = async (req , res) => {
+
+    const user = req.userID;
+    const isVendor = await VendorPro.findOne({ refId: user });
+    console.log(isVendor)
+    if(isVendor){
+      try{
+        const data = await Service.find({vendorId:isVendor._id})
+        res.status(200).send(data)
+      }catch(e){
+        res.status(400).send("error",e)
+      }
+    }else{
+      res.status(400).send("no vendor is logged in")
+    }
+  }
+
+  const getVenueById = async (req,res) => {
+    const { venueId } = req.params;
+    const user = req.userID;
+    const isVendor = await VendorPro.findOne({ refId: user });
+    if (venueId && isVendor) {
+        try{
+            const data = await Venue.findById(venueId)
+            res.status(200).send(data)
+        }catch(error){
+          res.status(401).send(error)
+        }
+    }else{
+      res.status(400).send("no id or isnt vendor")
+    }
+  }
+
+  const updateVenue = async (req, res) => {
+    try {
+        console.log("Received Data:", req.body);  // Debugging
+
+        const { id, name, venueType, venueDecs, address, basePrice, locationUrl } = req.body;
+
+        if (!id) {
+            return res.status(400).json({ message: "Venue ID is required" });
+        }
+
+        let venue = await Venue.findById(id);
+        if (!venue) {
+            return res.status(404).json({ message: "Venue not found" });
+        }
+
+        // Update basic fields
+        venue.name = name;
+        venue.venueType = venueType;
+        venue.venueDecs = venueDecs;
+        venue.address = address;
+        venue.locationUrl = locationUrl;
+        venue.basePrice = basePrice;
+
+        // Handle tags (Ensure it's an array)
+        venue.tags = Array.isArray(req.body.tags) ? req.body.tags : JSON.parse(req.body.tags);
+
+        // Handle Removed Images
+        if (req.body.removedImages) {
+            const removedImages = JSON.parse(req.body.removedImages);
+            venue.images = venue.images.filter(img => !removedImages.includes(img));
+
+        }
+
+        // Handle New Images
+        if (req.files && req.files["images"]) {
+            const newImages = req.files["images"].map(file => `/assets/images/${file.filename}`);
+            venue.images.push(...newImages); // Append new images
+        }
+
+        // Save updated venue
+        await venue.save();
+
+        res.status(200).json({ message: "Venue updated successfully!", venue });
+
+    } catch (error) {
+        console.error("Error updating venue:", error);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+};
+
+
+
+
+module.exports = {addVenue,addServices,acceptService,rejectService, GetVenue , GetServicesByVenue ,getAllVenue ,getVendorsVenues , getVendorsServices , getVenueById , updateVenue}

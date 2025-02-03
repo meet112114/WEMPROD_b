@@ -11,7 +11,7 @@ router.use(cookieParser());
 
 const LoginAuth = require('../middleware/jwtmiddleware');
 const {  googleRoute, clintRegisterRoute , loginRoute , EditProfile, vendorRegisterRoute , getVendorProfile} = require('../controller/accountControllers');
-const {addVenue , addServices,acceptService,rejectService,GetVenue ,GetServicesByVenue , getAllVenue} = require("../controller/venueControllers");
+const {addVenue , addServices,acceptService,rejectService,GetVenue ,GetServicesByVenue , getAllVenue ,getVendorsVenues , getVendorsServices , getVenueById , updateVenue} = require("../controller/venueControllers");
 
 // multer config
 
@@ -69,5 +69,9 @@ router.post('/reject/service' , LoginAuth , rejectService)  // reject the servic
 router.get('/getAllVenue', getAllVenue)
 router.get('/get/venue/:location' , GetVenue)
 router.get('/get/serviceById/:venueId' , GetServicesByVenue)
+router.get('/get/vendors/venues' , LoginAuth , getVendorsVenues)
+router.get('/get/vendors/services' , LoginAuth , getVendorsServices)
+router.get('/get/venueByID/:venueId', LoginAuth , getVenueById)
+router.put('/edit/venue' , LoginAuth, uploadFiles , updateVenue)
 
 module.exports = router;
