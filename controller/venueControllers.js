@@ -287,9 +287,27 @@ const addServices = async (req, res) => {
     }
   }
 
+  const getServiceById = async (req,res) => {
+    const { serviceId } = req.params;
+    console.log(serviceId)
+    const user = req.userID;
+    const isVendor = await VendorPro.findOne({ refId: user });
+    if (serviceId && isVendor) {
+      try{
+          const data = await Service.findById(serviceId)
+          console.log(data)
+          console.log("hiiiiii")
+          res.status(200).send(data)
+      }catch(error){
+        res.status(401).send(error)
+      }
+  }else{
+    res.status(400).send("no id or isnt vendor")
+  }
+  }
+
   const updateVenue = async (req, res) => {
     try {
-        console.log("Received Data:", req.body);  // Debugging
 
         const { id, name, venueType, venueDecs, address, basePrice, locationUrl } = req.body;
 
@@ -338,6 +356,53 @@ const addServices = async (req, res) => {
 };
 
 
+const updateService = async (req, res) => {
 
 
-module.exports = {addVenue,addServices,acceptService,rejectService, GetVenue , GetServicesByVenue ,getAllVenue ,getVendorsVenues , getVendorsServices , getVenueById , updateVenue}
+  const user = req.userID;
+  const isVendor = await VendorPro.findOne({ refId: user });
+
+  try {
+    const { id, name, description, plans } = req.body;
+
+    const parsedPlans = plans ? JSON.parse(plans) : [];
+
+
+    const updatedPlans = parsedPlans.map(plan => {
+      if (plan._id && mongoose.Types.ObjectId.isValid(plan._id)) {
+        return { ...plan, _id: new mongoose.Types.ObjectId(plan._id) };
+      } else {
+        delete plan._id; 
+        return plan;
+      }
+    });
+
+    const removedImages = req.body.removedImages ? JSON.parse(req.body.removedImages) : [];
+
+    const images = req.files?.images
+      ? req.files.images.map((file) => `/assets/images/${file.filename}`)
+      : [];
+
+    const service = await Service.findById(id);
+
+    if (!service) return res.status(404).json({ message: "Service not found" });
+
+    service.name = name;
+    service.description = description;
+    service.plans = updatedPlans;
+    service.images = service.images.filter(img => !removedImages.includes(img)).concat(images);
+    service.location = isVendor.location; 
+
+    await service.save();
+
+    res.status(200).json({ message: "Service updated successfully", service });
+  } catch (error) {
+    console.error("Error updating service:", error);
+    res.status(500).json({ message: "Error updating service", error: error.message });
+  }
+};
+
+
+
+
+module.exports = {addVenue,addServices,acceptService,rejectService, GetVenue , GetServicesByVenue ,getAllVenue ,getVendorsVenues , getVendorsServices , getVenueById , updateVenue , getServiceById , updateService}
