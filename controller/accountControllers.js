@@ -239,11 +239,90 @@ const getVendorProfile = async (req,res) => {
   }
 }
 
+const addInquiryVenue = async (req, res) => {
+  const { vendorId, venueId, userName, contactNumber, contactEmail, message } = req.body;
+
+  try {
+    // Check if all required fields are present
+    if (!vendorId || !venueId || !userName || !contactNumber || !message) {
+      return res.status(400).json({ error: "Missing required fields" });
+    }
+
+    // Find vendor by ID
+    const vendor = await VendorPro.findById(vendorId);
+    if (!vendor) {
+      return res.status(404).json({ error: "Vendor not found" });
+    }
+
+    // Create the inquiry object
+    const newInquiry = {
+      venueId,
+      userName,
+      contactNumber,
+      contactEmail: contactEmail || "Not Provided", // Handle optional email
+      message,
+    };
+
+    // Add the new inquiry to venueInquiry array
+    vendor.venueInquiry.push(newInquiry);
+
+    // Save the updated vendor document
+    await vendor.save();
+
+    res.status(201).json({ message: "Inquiry added successfully", inquiry: newInquiry });
+
+  } catch (error) {
+    console.error("Error adding venue inquiry:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+
+const addInquiryService = async (req, res) => {
+  const { vendorId, serviceId, userName, contactNumber, contactEmail, message } = req.body;
+
+  try {
+    // Check if all required fields are present
+    if (!vendorId || !serviceId || !userName || !contactNumber || !message) {
+      return res.status(400).json({ error: "Missing required fields" });
+    }
+
+    // Find vendor by ID
+    const vendor = await VendorPro.findById(vendorId);
+    if (!vendor) {
+      return res.status(404).json({ error: "Vendor not found" });
+    }
+
+    // Create the inquiry object
+    const newInquiry = {
+      serviceId,
+      userName,
+      contactNumber,
+      contactEmail: contactEmail || "Not Provided", // Handle optional email
+      message,
+    };
+
+    // Add the new inquiry to venueInquiry array
+    vendor.serviceInquiry.push(newInquiry);
+
+    // Save the updated vendor document
+    await vendor.save();
+
+    res.status(201).json({ message: "Inquiry added successfully", inquiry: newInquiry });
+
+  } catch (error) {
+    console.error("Error adding sevice inquiry:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
 module.exports = {
   googleRoute,
   clintRegisterRoute,
   loginRoute,
   EditProfile,
   vendorRegisterRoute,
-  getVendorProfile
+  getVendorProfile,
+  addInquiryVenue,
+  addInquiryService
 };

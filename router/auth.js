@@ -10,8 +10,8 @@ router.use(cookieParser());
 //  importing controller functions  
 
 const LoginAuth = require('../middleware/jwtmiddleware');
-const {  googleRoute, clintRegisterRoute , loginRoute , EditProfile, vendorRegisterRoute , getVendorProfile} = require('../controller/accountControllers');
-const {addVenue , addServices,acceptService,rejectService,GetVenue ,GetServicesByVenue , getAllVenue ,getVendorsVenues , getVendorsServices , getVenueById , updateVenue , getServiceById , updateService} = require("../controller/venueControllers");
+const {  googleRoute, clintRegisterRoute , loginRoute , EditProfile, vendorRegisterRoute , getVendorProfile , addInquiryVenue , addInquiryService} = require('../controller/accountControllers');
+const {addVenue , addServices,acceptService,rejectService,GetVenue ,GetServicesByVenue , getAllVenue ,getVendorsVenues , getVendorsServices , getVenueById , updateVenue , getServiceById , updateService,getAllServices} = require("../controller/venueControllers");
 
 // multer config
 
@@ -67,13 +67,16 @@ router.post('/add/service', LoginAuth ,uploadFiles ,addServices ) // adding new 
 router.post('/accept/service' , LoginAuth , acceptService)  // accepting services in a venue
 router.post('/reject/service' , LoginAuth , rejectService)  // reject the service from vendors venue
 router.get('/getAllVenue', getAllVenue)
+router.get('/getAllService' , getAllServices)
 router.get('/get/venue/:location' , GetVenue)
 router.get('/get/serviceById/:venueId' , GetServicesByVenue)
 router.get('/get/vendors/venues' , LoginAuth , getVendorsVenues)
 router.get('/get/vendors/services' , LoginAuth , getVendorsServices)
-router.get('/get/venueByID/:venueId', LoginAuth , getVenueById)
-router.get('/get/servicesByID/:serviceId' , LoginAuth , getServiceById)
+router.get('/get/venueByID/:venueId',   getVenueById)
+router.get('/get/servicesByID/:serviceId'  , getServiceById)
 router.put('/edit/venue' , LoginAuth, uploadFiles , updateVenue)
 router.put('/edit/service' , LoginAuth , uploadFiles , updateService)
+router.post('/add/venue/inquiry' , addInquiryVenue)
+router.post('/add/service/inquiry' , addInquiryService)
 
 module.exports = router;

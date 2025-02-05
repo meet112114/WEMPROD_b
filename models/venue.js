@@ -9,6 +9,10 @@ const VenueSchema = new mongoose.Schema({
         type: String,
         required : true
     },
+    vendorName : {
+        type: String,
+        required : true
+    },
     venueType:{
         type: String,
         required : true

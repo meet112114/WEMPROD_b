@@ -19,6 +19,7 @@ const addVenue = async (req, res) => {
       if (name && venueType && venueDecs && location && basePrice) {
           const venue = new Venue({
               vendorId: isVendor._id,
+              vendorName: isVendor.name,
               name,
               venueType,
               venueDecs,
@@ -53,7 +54,7 @@ const addServices = async (req, res) => {
   const location = isVendor.location;
 
   if (isVendor) {
-    const { name, description, plans, venues } = req.body;
+    const { name, description, plans, venues , serviceType} = req.body;
 
     try {
       // Parse JSON string fields
@@ -76,7 +77,9 @@ const addServices = async (req, res) => {
 
       const newService = new Service({
         name,
+        serviceType,
         vendorId: isVendor._id,
+        vendorName : isVendor.name,
         location,
         description,
         plans: plansArray,
@@ -273,9 +276,7 @@ const addServices = async (req, res) => {
 
   const getVenueById = async (req,res) => {
     const { venueId } = req.params;
-    const user = req.userID;
-    const isVendor = await VendorPro.findOne({ refId: user });
-    if (venueId && isVendor) {
+    if (venueId ) {
         try{
             const data = await Venue.findById(venueId)
             res.status(200).send(data)
@@ -289,14 +290,9 @@ const addServices = async (req, res) => {
 
   const getServiceById = async (req,res) => {
     const { serviceId } = req.params;
-    console.log(serviceId)
-    const user = req.userID;
-    const isVendor = await VendorPro.findOne({ refId: user });
-    if (serviceId && isVendor) {
+    if (serviceId ) {
       try{
           const data = await Service.findById(serviceId)
-          console.log(data)
-          console.log("hiiiiii")
           res.status(200).send(data)
       }catch(error){
         res.status(401).send(error)
@@ -403,6 +399,13 @@ const updateService = async (req, res) => {
 };
 
 
+const getAllServices = async(req,res)=> {
+  try{
+    const data = await Service.find();
+    res.send(data).status(200)
+  }catch(error){
+    res.status(400).send(error)
+  }
+}
 
-
-module.exports = {addVenue,addServices,acceptService,rejectService, GetVenue , GetServicesByVenue ,getAllVenue ,getVendorsVenues , getVendorsServices , getVenueById , updateVenue , getServiceById , updateService}
+module.exports = {addVenue,addServices,acceptService,rejectService, GetVenue , GetServicesByVenue ,getAllVenue ,getVendorsVenues , getVendorsServices , getVenueById , updateVenue , getServiceById , updateService , getAllServices}

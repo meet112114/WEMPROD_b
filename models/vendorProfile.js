@@ -31,7 +31,51 @@ const vendorProfile = new mongoose.Schema({
     },
     services : {
         type: [String], 
-    }
+    },
+    venueInquiry:[{
+        venueId:{
+            type:String,
+            required:true
+        },
+        userName:{
+            type:String,
+            required:true
+        },
+        contactNumber:{
+            type:Number,
+            required:true
+        },
+        contactEmail:{
+            type:String,
+            required:true
+        },
+        message:{
+            type:String,
+            required:true
+        }
+    }],
+    serviceInquiry:[{
+        serviceId:{
+            type:String,
+            required:true
+        },
+        userName:{
+            type:String,
+            required:true
+        },
+        contactNumber:{
+            type:Number,
+            required:true
+        },
+        contactEmail:{
+            type:String,
+            required:true
+        },
+        message:{
+            type:String,
+            required:true
+        }
+    }]
 
 });
 

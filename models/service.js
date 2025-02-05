@@ -5,9 +5,19 @@ const ServicesSchema = new mongoose.Schema({
         type: String,
         required : true
     },
+    serviceType:{
+      type:String,
+      required:true,
+      enum:["catering","decoration","entertainment","photography","makeup","others"],
+      default:"others"
+    },
     vendorId : {
         type: String,
         required : true
+    },
+    vendorName:{
+      type: String,
+      required : true
     },
     description :{
         type: String,
