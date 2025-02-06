@@ -10,7 +10,7 @@ router.use(cookieParser());
 //  importing controller functions  
 
 const LoginAuth = require('../middleware/jwtmiddleware');
-const {  googleRoute, clintRegisterRoute , loginRoute , EditProfile, vendorRegisterRoute , getVendorProfile , addInquiryVenue , addInquiryService} = require('../controller/accountControllers');
+const {  googleRoute, clintRegisterRoute , loginRoute , EditProfile, vendorRegisterRoute , getVendorProfile , addInquiryVenue , addInquiryService , deleteVenueInquiry , deleteServiceInquiry} = require('../controller/accountControllers');
 const {addVenue , addServices,acceptService,rejectService,GetVenue ,GetServicesByVenue , getAllVenue ,getVendorsVenues , getVendorsServices , getVenueById , updateVenue , getServiceById , updateService,getAllServices} = require("../controller/venueControllers");
 
 // multer config
@@ -78,5 +78,8 @@ router.put('/edit/venue' , LoginAuth, uploadFiles , updateVenue)
 router.put('/edit/service' , LoginAuth , uploadFiles , updateService)
 router.post('/add/venue/inquiry' , addInquiryVenue)
 router.post('/add/service/inquiry' , addInquiryService)
+router.delete("/deleteVenueInquiry/:vendorId/:inquiryId", deleteVenueInquiry);
+router.delete("/deleteServiceInquiry/:vendorId/:inquiryId", deleteServiceInquiry);
+
 
 module.exports = router;

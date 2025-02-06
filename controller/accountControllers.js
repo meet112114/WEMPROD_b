@@ -240,11 +240,11 @@ const getVendorProfile = async (req,res) => {
 }
 
 const addInquiryVenue = async (req, res) => {
-  const { vendorId, venueId, userName, contactNumber, contactEmail, message } = req.body;
+  const { vendorId, venueName ,venueId, userName, contactNumber, contactEmail, message } = req.body;
 
   try {
     // Check if all required fields are present
-    if (!vendorId || !venueId || !userName || !contactNumber || !message) {
+    if (!vendorId || !venueName || !venueId || !userName || !contactNumber || !message) {
       return res.status(400).json({ error: "Missing required fields" });
     }
 
@@ -257,6 +257,7 @@ const addInquiryVenue = async (req, res) => {
     // Create the inquiry object
     const newInquiry = {
       venueId,
+      venueName,
       userName,
       contactNumber,
       contactEmail: contactEmail || "Not Provided", // Handle optional email
@@ -279,11 +280,11 @@ const addInquiryVenue = async (req, res) => {
 
 
 const addInquiryService = async (req, res) => {
-  const { vendorId, serviceId, userName, contactNumber, contactEmail, message } = req.body;
-
+  const { vendorId,serviceName ,  serviceId, userName, contactNumber, contactEmail, message } = req.body;
+  console.log(serviceName)
   try {
     // Check if all required fields are present
-    if (!vendorId || !serviceId || !userName || !contactNumber || !message) {
+    if (!vendorId || !serviceName || !serviceId || !userName || !contactNumber || !message) {
       return res.status(400).json({ error: "Missing required fields" });
     }
 
@@ -296,13 +297,13 @@ const addInquiryService = async (req, res) => {
     // Create the inquiry object
     const newInquiry = {
       serviceId,
+      serviceName,
       userName,
       contactNumber,
       contactEmail: contactEmail || "Not Provided", // Handle optional email
       message,
     };
 
-    // Add the new inquiry to venueInquiry array
     vendor.serviceInquiry.push(newInquiry);
 
     // Save the updated vendor document
@@ -316,6 +317,53 @@ const addInquiryService = async (req, res) => {
   }
 };
 
+const deleteVenueInquiry = async (req, res) => {
+  try {
+    const { vendorId, inquiryId } = req.params;
+
+    // Find vendor
+    const vendor = await VendorPro.findById(vendorId);
+    if (!vendor) {
+      return res.status(404).json({ error: "Vendor not found" });
+    }
+
+    // Remove the inquiry from venueInquiry array
+    vendor.venueInquiry = vendor.venueInquiry.filter(inquiry => inquiry._id.toString() !== inquiryId);
+
+    // Save the updated vendor document
+    await vendor.save();
+
+    res.status(200).json({ message: "Inquiry deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting venue inquiry:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+const deleteServiceInquiry = async (req, res) => {
+  try {
+    const { vendorId, inquiryId } = req.params;
+
+    // Find vendor
+    const vendor = await VendorPro.findById(vendorId);
+    if (!vendor) {
+      return res.status(404).json({ error: "Vendor not found" });
+    }
+
+    // Remove the inquiry from serviceInquiry array
+    vendor.serviceInquiry = vendor.serviceInquiry.filter(inquiry => inquiry._id.toString() !== inquiryId);
+
+    // Save the updated vendor document
+    await vendor.save();
+
+    res.status(200).json({ message: "Service inquiry deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting service inquiry:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+
 module.exports = {
   googleRoute,
   clintRegisterRoute,
@@ -324,5 +372,7 @@ module.exports = {
   vendorRegisterRoute,
   getVendorProfile,
   addInquiryVenue,
-  addInquiryService
+  addInquiryService,
+  deleteVenueInquiry,
+  deleteServiceInquiry
 };
