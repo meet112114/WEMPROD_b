@@ -365,8 +365,8 @@ const updateService = async (req, res) => {
 
 
     const updatedPlans = parsedPlans.map(plan => {
-      if (plan._id && mongoose.Types.ObjectId.isValid(plan._id)) {
-        return { ...plan, _id: new mongoose.Types.ObjectId(plan._id) };
+      if (plan._id) {
+        return { ...plan, _id: plan._id };
       } else {
         delete plan._id; 
         return plan;
