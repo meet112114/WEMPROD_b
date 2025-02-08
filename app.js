@@ -19,6 +19,7 @@ app.use(passport.session());
 app.use(require('./router/auth'));
 
 app.use('/assets/images', express.static(path.join(__dirname, './assets/images')));
+app.use('/assets/outfit', express.static(path.join(__dirname, './assets/outfit')));
 
 const PORT = process.env.PORT || 5000;
 
