@@ -29,6 +29,6 @@ app.use('/assets/outfit', express.static(path.join(__dirname, './assets/outfit')
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-    console.log(`Server is running at port number ${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server is running on port ${PORT}`);
 });
