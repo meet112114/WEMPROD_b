@@ -1,11 +1,17 @@
 const dotenv = require("dotenv");
 const express = require('express');
 const session = require('express-session');
-const passport = require('./router/passport'); // Corrected path
+const passport = require('./router/passport'); 
+const cors = require('cors');
 dotenv.config({path:"./config.env"});
 const path = require('path');
 
 const app = express();
+app.use(cors({
+    origin: '*',  // Allow all origins (You can restrict it to your frontend IP)
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 app.use(session({
     resave: false,
