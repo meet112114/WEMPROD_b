@@ -185,10 +185,11 @@ const loginRoute = async (req, res) => {
       expiresIn: "7d",
     });
 
-    res.cookie("jwtoken", token, {
-      expires: new Date(Date.now() + 2589200000), // About 30 days
-      httpOnly: true,
-    });
+       res.cookie('jwtoken', token, {
+        httpOnly: false, 
+        secure: true, 
+        sameSite: 'None', 
+        });
 
     return res.status(200).json({ message: "User login successful", token });
   } catch (error) {
