@@ -190,7 +190,7 @@ const loginRoute = async (req, res) => {
       httpOnly: true,
     });
 
-    return res.status(200).json({ message: "User login successful", token });
+    res.json({ token });
   } catch (error) {
     console.error("Error in login route:", error);
     res.status(500).json({ error: "Internal server error" });
