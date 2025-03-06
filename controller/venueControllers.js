@@ -3,6 +3,22 @@ const VendorPro = require("../models/vendorProfile");
 const Venue = require("../models/venue")
 const Service = require("../models/service")
 
+const update = async (req, res) => {
+  console.log("hiiii")
+  try {
+      // Update all venues where status is missing
+      await Venue.updateMany({ status: { $exists: false } }, { $set: { status: "pending" } });
+
+      // Update all services where status is missing
+      await Service.updateMany({ status: { $exists: false } }, { $set: { status: "pending" } });
+
+      res.status(200).json({ message: "Status field updated successfully!" });
+  } catch (error) {
+      console.error("Error updating status:", error);
+      res.status(500).json({ error: "Failed to update status" });
+  }
+};
+
 const addVenue = async (req, res) => {
   const user = req.userID;
   const isVendor = await VendorPro.findOne({ refId: user });
@@ -408,4 +424,6 @@ const getAllServices = async(req,res)=> {
   }
 }
 
-module.exports = {addVenue,addServices,acceptService,rejectService, GetVenue , GetServicesByVenue ,getAllVenue ,getVendorsVenues , getVendorsServices , getVenueById , updateVenue , getServiceById , updateService , getAllServices}
+
+
+module.exports = {addVenue,addServices,acceptService,rejectService, GetVenue , GetServicesByVenue ,getAllVenue ,getVendorsVenues , getVendorsServices , getVenueById , updateVenue , getServiceById , updateService , getAllServices , update}

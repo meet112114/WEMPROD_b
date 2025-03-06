@@ -56,7 +56,13 @@ const ServicesSchema = new mongoose.Schema({
             required: true,
           },
         },
-      ]
+      ],
+
+  status:{
+    type:String,
+    enum:["accepted","rejected","pending"],
+    default:"pending"
+}
 })
 
 const Service = mongoose.model("Service" , ServicesSchema )

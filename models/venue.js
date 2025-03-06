@@ -47,6 +47,11 @@ const VenueSchema = new mongoose.Schema({
     images : {  
         type: [String],  
         required: false
+    },
+    status:{
+        type:String,
+        enum:["accepted","rejected","pending"],
+        default:"pending"
     }
 })
 

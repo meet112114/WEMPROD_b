@@ -5,6 +5,17 @@ const passport = require('./router/passport');
 const cors = require('cors');
 dotenv.config({path:"./config.env"});
 const path = require('path');
+const MongoStore = require('connect-mongo'); // Import connect-mongo
+const mongoose = require('mongoose');
+
+mongoose.connect(process.env.DATABASE, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+})
+.then(() => console.log('MongoDB connected'))
+.catch(err => console.error('MongoDB connection error:', err));
+
+const stripe = require('stripe')(process.env.STRIPE_PRIVATE_KEY);
 
 const app = express();
 app.use(cors({
@@ -13,10 +24,19 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
+
 app.use(session({
+    secret: process.env.SESSION_SECRET,
     resave: false,
-    saveUninitialized: true,
-    secret: process.env.SESSION_SECRET 
+    saveUninitialized: false,
+    store: MongoStore.create({
+            mongoUrl: process.env.DATABASE, 
+            collectionName: 'sessions', 
+            mongoOptions: {
+                useNewUrlParser: true,
+                useUnifiedTopology: true
+            }
+        })
 }));
 
 app.use(passport.initialize());
