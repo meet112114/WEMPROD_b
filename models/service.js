@@ -8,8 +8,12 @@ const ServicesSchema = new mongoose.Schema({
     serviceType:{
       type:String,
       required:true,
-      enum:["catering","decoration","entertainment","photography","makeup","others"],
+      enum:["food","decoration","mehndi","photography", "jewellery", "bridalwear", "groomwear" ,"makeup","pandit" , "others" ],
       default:"others"
+    },
+    startPrice:{
+      type:Number,
+      default:10000
     },
     vendorId : {
         type: String,

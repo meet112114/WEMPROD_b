@@ -7,6 +7,8 @@ const BookingsSer = require("../models/bookingser");
 
 // Get all vendors
 const getAllVendorsA = async (req, res) => {
+
+
     try {
         const vendors = await VendorPro.find();
         res.status(200).json(vendors);
