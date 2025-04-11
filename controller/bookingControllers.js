@@ -317,4 +317,4 @@ const acceptBookingAdmin = async (req, res) => {
 };
 
 
-module.exports = { addBookingVen , getUserBookings ,getVendorBookings  , checkout , addBookingSer , getUserSerBooing , getVendorBookingsServices , updateBookingStatus , acceptBookingAdmin};
+module.exports = { addBookingVen , getUserBookings ,getVendorBookings  , checkout ,stripeWebhookHandler , addBookingSer , getUserSerBooing , getVendorBookingsServices , updateBookingStatus , acceptBookingAdmin};
