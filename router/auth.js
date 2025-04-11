@@ -27,8 +27,7 @@ const {  getAllVendorsA,
 
 
 const bodyParser = require('body-parser');
-router.post('/webhook', express.raw({ type: 'application/json' }), stripeWebhookHandler);
-
+router.post('/webhook', bodyParser.raw({ type: 'application/json' }), stripeWebhookHandler);
 
 
 router.use(express.json());
