@@ -9,10 +9,11 @@ router.use(cookieParser());
 
 const stripe = require('stripe')(process.env.STRIPE_PRIVATE_KEY)
 
+
 //  importing controller functions  
 
 const LoginAuth = require('../middleware/jwtmiddleware');
-const { addBookingVen ,addBookingSer, getUserBookings , getUserSerBooing , getVendorBookings, getVendorBookingsServices  , checkout , updateBookingStatus , acceptBookingAdmin} = require('../controller/bookingControllers')
+const { addBookingVen ,addBookingSer, getUserBookings , getUserSerBooing , getVendorBookings, getVendorBookingsServices  , checkout , stripeWebhookHandler , updateBookingStatus , acceptBookingAdmin} = require('../controller/bookingControllers')
 const {  googleRoute, clintRegisterRoute , loginRoute , EditProfile, vendorRegisterRoute , getVendorProfile , addInquiryVenue , addInquiryService , deleteVenueInquiry , deleteServiceInquiry} = require('../controller/accountControllers');
 const {addVenue , addServices,acceptService,rejectService,GetVenue ,GetServicesByVenue , getAllVenue ,getVendorsVenues , getVendorsServices , getVenueById , updateVenue , getServiceById , updateService,getAllServices , update} = require("../controller/venueControllers");
 const {  getAllVendorsA,
@@ -47,7 +48,7 @@ const uploadFiles = upload.fields([
   { name: 'images', maxCount: 10 } // Multiple images field
 ]);
 
-
+router.post('/webhook', bodyParser.raw({ type: 'application/json' }), stripeWebhookHandler);
 
 // google signin ( Oath2.0 ) routes 
 router.get('/auth/google', passport.authenticate('google', { scope: ['email', 'profile'] }));
