@@ -239,6 +239,9 @@ const stripeWebhookHandler = async (req, res) => {
 };
 
 
+
+
+
 const updateBookingStatus = async (req, res) => {
   const { bookingId } = req.params;
   const { status } = req.body; // Accept or Reject
