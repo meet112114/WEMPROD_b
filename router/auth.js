@@ -4,8 +4,7 @@ require('../database/connection');
 const router = express.Router();
 const cookieParser = require("cookie-parser");
 
-router.use(express.json());
-router.use(cookieParser());
+
 
 const stripe = require('stripe')(process.env.STRIPE_PRIVATE_KEY)
 
@@ -25,6 +24,16 @@ const {  getAllVendorsA,
   deleteServiceA,
   acceptVenue,
   acceptServiceadmin } = require('../controller/adminController')
+
+
+const bodyParser = require('body-parser');
+router.post('/webhook', bodyParser.raw({ type: 'application/json' }), stripeWebhookHandler);
+
+
+
+router.use(express.json());
+router.use(cookieParser());
+
 // multer config
 
 const path = require('path');
@@ -47,9 +56,6 @@ const upload = multer({ storage: storage })
 const uploadFiles = upload.fields([
   { name: 'images', maxCount: 10 } // Multiple images field
 ]);
-
-const bodyParser = require('body-parser');
-router.post('/webhook', bodyParser.raw({ type: 'application/json' }), stripeWebhookHandler);
 
 // google signin ( Oath2.0 ) routes 
 router.get('/auth/google', passport.authenticate('google', { scope: ['email', 'profile'] }));
