@@ -199,34 +199,35 @@ const getVendorBookingsServices = async(req,res) => {
 
 
 const stripeWebhookHandler = async (req, res) => {
-    console.log("hiiii")
-  const signature = req.headers['stripe-signature'];
+  const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
   const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
+  const signature = req.headers['stripe-signature'];
 
-  let event;
   try {
-    event = stripe.webhooks.constructEvent(req.body, signature, endpointSecret);
+    const event = stripe.webhooks.constructEvent(req.body, signature, endpointSecret);
 
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object;
       const bookingId = session.metadata.bookingId;
 
-      // Try updating in venue bookings
-      let updated = await BookingVen.findByIdAndUpdate(bookingId, {
-        $set: { 'payment.status': true }
+      // Try to update BookingVen first
+      const venueBooking = await BookingVen.findByIdAndUpdate(bookingId, {
+        $set: { 'payment.status': true },
       });
 
-      // If not found in venues, try service bookings
-      if (!updated) {
-        updated = await BookingSer.findByIdAndUpdate(bookingId, {
-          $set: { 'payment.status': true }
-        });
-      }
-
-      if (updated) {
-        console.log(`✅ Booking ${bookingId} marked as paid`);
+      if (venueBooking) {
+        console.log(`✅ Venue Booking ${bookingId} marked as paid`);
       } else {
-        console.log(`⚠️ Booking ${bookingId} not found in either collection`);
+        // If not found in Venue, try in Service
+        const serviceBooking = await BookingSer.findByIdAndUpdate(bookingId, {
+          $set: { 'payment.status': true },
+        });
+
+        if (serviceBooking) {
+          console.log(`✅ Service Booking ${bookingId} marked as paid`);
+        } else {
+          console.warn(`❌ No booking found with ID: ${bookingId}`);
+        }
       }
     }
 
