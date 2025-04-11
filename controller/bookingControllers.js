@@ -176,12 +176,15 @@ const getVendorBookingsServices = async(req,res) => {
               {
                   price_data: {
                       currency: bookingDetails.currency.toLowerCase(),
-                      product_data: { name: "Venue Booking" },
+                      product_data: { name: "Your Booking" },
                       unit_amount: amount,
                   },
                   quantity: 1,
               },
           ],
+          metadata: {
+                bookingId: bookingDetails.bookingId.toString(),
+              },
           mode: "payment",
           success_url: `${baseUrl}/bookings`,
           cancel_url: `${baseUrl}/cancel`,
