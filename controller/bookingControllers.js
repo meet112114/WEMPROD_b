@@ -162,7 +162,7 @@ const getVendorBookingsServices = async(req,res) => {
       const { bookingDetails, baseUrl } = req.body;
 
       // Validate request body
-      if (!bookingDetails || !bookingDetails.venueId || !bookingDetails.vendorId) {
+      if (!bookingDetails || !bookingDetails.productId || !bookingDetails.vendorId) {
           return res.status(400).json({ error: "Invalid booking details" });
       }
 
