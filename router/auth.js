@@ -23,9 +23,8 @@ const {  getAllVendorsA,
   deleteVenueA,
   deleteServiceA,
   acceptVenue,
-  acceptServiceadmin } = require('../controller/adminController')
-
-
+  acceptServiceadmin } = require('../controller/adminController');
+const  { healthCheck } = require('../controller/healthCheckController');
 const bodyParser = require('body-parser');
 router.post('/webhook', bodyParser.raw({ type: 'application/json' }), stripeWebhookHandler);
 
@@ -123,5 +122,6 @@ router.put("/admin/service/accept/:serviceId", acceptServiceadmin);
 
 router.put('/admin/update/booking/:bookingId' , acceptBookingAdmin);
 
+router.get("/health", healthCheck);
 
 module.exports = router;
